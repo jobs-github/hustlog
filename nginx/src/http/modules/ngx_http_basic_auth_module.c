@@ -138,8 +138,7 @@ static ngx_int_t ngx_http_basic_auth_handler(ngx_http_request_t *r)
 		it = it->next;
 	}
 
-	ngx_http_basic_auth_set_realm(r);
-	return NGX_DECLINED;
+	return ngx_http_basic_auth_set_realm(r);
 }
 
 static ngx_int_t ngx_http_basic_auth_set_realm(ngx_http_request_t *r)
