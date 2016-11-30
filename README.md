@@ -25,7 +25,7 @@
 
 ## 部署 ##
     $ cd nginx
-    $ ./configure --prefix=/data/hustlog --add-module=src/addon
+    $ sh Config.sh
     $ make
     $ make install
 
@@ -34,7 +34,6 @@
 部署完毕之后，可以看到目录结构如下：
 
 `conf`  
-　　`htpasswd`  
 　　`hustlog.conf`  
 　　`nginx.conf`  
 `sbin`  
@@ -79,17 +78,17 @@
 
 如果想把日志目录的创建自动化，可以通过修改 `nginx` 工程配置文件实现，文件目录： `hustlog/nginx/auto/install` ，找到这一段：
 
-    install:	$NGX_OBJS${ngx_dirsep}nginx${ngx_binext} \
-    		$NGX_INSTALL_PERL_MODULES
-    	test -d '\$(DESTDIR)$NGX_PREFIX' || mkdir -p '\$(DESTDIR)$NGX_PREFIX'
-    	test -d '\$(DESTDIR)$NGX_PREFIX/client_body_temp' || mkdir -p '\$(DESTDIR)$NGX_PREFIX/client_body_temp'
-    	test -d '\$(DESTDIR)$NGX_PREFIX/proxy_temp' || mkdir -p '\$(DESTDIR)$NGX_PREFIX/proxy_temp'
-    	test -d '\$(DESTDIR)$NGX_PREFIX/fastcgi_temp' || mkdir -p '\$(DESTDIR)$NGX_PREFIX/fastcgi_temp'
-    	test -d '\$(DESTDIR)$NGX_PREFIX/uwsgi_temp' || mkdir -p '\$(DESTDIR)$NGX_PREFIX/uwsgi_temp'
-    	test -d '\$(DESTDIR)$NGX_PREFIX/scgi_temp' || mkdir -p '\$(DESTDIR)$NGX_PREFIX/scgi_temp'
-    	
-    	test -d '\$(DESTDIR)$NGX_PREFIX/logs' || mkdir -p '\$(DESTDIR)$NGX_PREFIX/logs'
-    	test -d '\$(DESTDIR)$NGX_PREFIX/logs/business' || mkdir -p '\$(DESTDIR)$NGX_PREFIX/logs/business'
+    install:	build $NGX_INSTALL_PERL_MODULES
+        test -d '\$(DESTDIR)$NGX_PREFIX' || mkdir -p '\$(DESTDIR)$NGX_PREFIX'
+        test -d '\$(DESTDIR)$NGX_PREFIX/client_body_temp' || mkdir -p '\$(DESTDIR)$NGX_PREFIX/client_body_temp'
+        test -d '\$(DESTDIR)$NGX_PREFIX/proxy_temp' || mkdir -p '\$(DESTDIR)$NGX_PREFIX/proxy_temp'
+        test -d '\$(DESTDIR)$NGX_PREFIX/fastcgi_temp' || mkdir -p '\$(DESTDIR)$NGX_PREFIX/fastcgi_temp'
+        test -d '\$(DESTDIR)$NGX_PREFIX/uwsgi_temp' || mkdir -p '\$(DESTDIR)$NGX_PREFIX/uwsgi_temp'
+        test -d '\$(DESTDIR)$NGX_PREFIX/scgi_temp' || mkdir -p '\$(DESTDIR)$NGX_PREFIX/scgi_temp'
+        
+        test -d '\$(DESTDIR)$NGX_PREFIX/logs' || mkdir -p '\$(DESTDIR)$NGX_PREFIX/logs'
+        test -d '\$(DESTDIR)$NGX_PREFIX/logs/business' || mkdir -p '\$(DESTDIR)$NGX_PREFIX/logs/business'
+
 从这一行开始就是日志目录的配置：
 
     test -d '\$(DESTDIR)$NGX_PREFIX/logs/business' || mkdir -p '\$(DESTDIR)$NGX_PREFIX/logs/business'
@@ -190,7 +189,7 @@ nginx 内置的 `ngx_http_auth_basic_module` 由于使用了非对称加密存�
 **返回值范例:**
 
 	HTTP/1.1 200 OK
-    Server: nginx/1.9.4
+    Server: nginx/1.10.0
     Date: Tue, 12 Apr 2016 08:31:12 GMT
     Content-Type: text/plain
     Content-Length: 0
