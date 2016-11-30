@@ -227,7 +227,7 @@ nginx 内置的 `ngx_http_auth_basic_module` 由于使用了非对称加密存�
 
 测试结果：
 
-    Server Software:        nginx/1.9.4
+    Server Software:        nginx/1.10.0
     Server Hostname:        localhost
     Server Port:            8667
     
