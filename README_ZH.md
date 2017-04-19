@@ -1,21 +1,21 @@
-[简体中文](README_ZH.md)
+[English](README.md)
 
-# hustlog - High performance network log service #
+# hustlog - 高性能的网络日志服务 #
 
-`hustlog` is a high performance network log service with high availability of http interface. It is implemented as nginx module based on `zlog`.  
+`hustlog` 是一个高性能的网络日志服务，在 `zlog` 的基础上以 `nginx` 模块的方式提供了高可用的网络层以及 `http` 接口。
 
-## Features ##
+## 特性 ##
 
-`zlog` is a high-performance standalone log service, while `nginx` is an industrial-grade http server. Benefited much from them, `hustlog` has the following features:  
+`zlog` 是一套高性能的单机版日志服务程序，`nginx` 是工业级的 `http server` 标准，得益于此，`hustlog` 具备以下特性：
   
-* High Throughput. The benchmark shows that `QPS` hits **12 thousand** and even more.  
-* High Concurrency. Please refer to concurrency report of `nginx` for more details.  
-* High Availability. Please refer to `master-worker` design of `nginx`.  
+* 高吞吐量。性能测试 `QPS` 在 **1.2w** 以上。  
+* 高并发。参考 `nginx` 的并发能力。  
+* 高可用性。参考 `nginx` 的 `master-worker` 架构。
 
-## Dependency ##
+## 依赖 ##
 * [zlog](https://github.com/HardySimpson/zlog)
 
-Installation of `zlog`:  
+`zlog` 的安装方法：
 
     $ git clone https://github.com/HardySimpson/zlog
     $ cd zlog
@@ -25,15 +25,15 @@ Installation of `zlog`:
     $ /usr/local/lib
     $ sudo ldconfig
 
-## Deployment ##
+## 部署 ##
     $ cd nginx
     $ sh Config.sh
     $ make
     $ make install
 
-## Structure ##
+## 目录结构 ##
 
-After deployment is done, you can see the directory structure as belows:  
+部署完毕之后，可以看到目录结构如下：
 
 `conf`  
 　　`hustlog.conf`  
@@ -48,15 +48,15 @@ After deployment is done, you can see the directory structure as belows:
 `scgi_temp`  
 `uwsgi_temp`  
 
-Please pay attention to those who list the subdirectories.  
+其中列出了子目录的是 `hustlog` 需要重点关注的对象
 
-## Configuration ##
-The following contents assume that the installation path of the `hustlog` is `/data/hustlog`.  
+## 配置 ##
+以下内容均假定 `hustlog` 部署的路径为：`/data/hustlog`
 
-### Configuration of `zlog` ###
-File path: `/data/hustlog/conf/hustlog.conf`
+### `zlog` 配置 ###
+文件路径：`/data/hustlog/conf/hustlog.conf`
 
-File contents sample:  
+文件内容样例：
 
     [global]
     strict init = true
@@ -71,14 +71,14 @@ File contents sample:
     [rules]
     business.*             "/data/hustlog/logs/business/%d(%Y-%m-%d-%H).log";         default
 
-Please refer to [here](https://hardysimpson.github.io/zlog/UsersGuide-CN.html) for details on above fields. In addition, please pay attention to the notes as following:  
+以上字段的含义均可在 [这里](https://hardysimpson.github.io/zlog/UsersGuide-CN.html) 找到具体说明。除此之外需要注意的几点：
 
 * `worker`  
-In section `formats`, the value of field `default` contains a `MDC` named `worker` (refer to [zlog](https://hardysimpson.github.io/zlog/UsersGuide-CN.html) for details on `MDC`), which is usually used to identify the process of the client who delivers log. This is useful for log analysis and troubleshooting , making it easy to find the source of log.  
-* `rules` 
-The `rules` section is used to configure specific log output rules. In above example, `business` represents the business name, `/data/hustlog/logs/business/%d(%Y-%m-%d-%H).log` represents the output directory of log (**please make sure that `/data/hustlog/logs/business` already exists. Otherwise, you need to create it before starting the service**)，`default` represents the format of log.  
+`formats` 节下的 `default` 字段值里有一个 `MDC` 叫做 `worker` （MDC的含义参考 [zlog文档](https://hardysimpson.github.io/zlog/UsersGuide-CN.html)），通常用于标识投递日志的客户端进程，这在进行日志分析和故障排除的时候会很有用，可以方便定位到日志输入源。
+* `rules`  
+`rules` 节用于配置具体的日志输出规则，上述样例中，`business` 代表业务名称，`/data/hustlog/logs/business/%d(%Y-%m-%d-%H).log` 代表日志输出的路径（ **请确保 `/data/hustlog/logs/business` 已经存在，如果不存在，请在启动服务之前创建它** ），`default` 代表日志打印的格式。
 
-If you want to automate the creation of log directories, please modify the configuration of nginx project in file `hustlog/nginx/auto/install` as below:  
+如果想把日志目录的创建自动化，可以通过修改 `nginx` 工程配置文件实现，文件目录： `hustlog/nginx/auto/install` ，找到这一段：
 
     install:	build $NGX_INSTALL_PERL_MODULES
         test -d '\$(DESTDIR)$NGX_PREFIX' || mkdir -p '\$(DESTDIR)$NGX_PREFIX'
@@ -91,17 +91,17 @@ If you want to automate the creation of log directories, please modify the confi
         test -d '\$(DESTDIR)$NGX_PREFIX/logs' || mkdir -p '\$(DESTDIR)$NGX_PREFIX/logs'
         test -d '\$(DESTDIR)$NGX_PREFIX/logs/business' || mkdir -p '\$(DESTDIR)$NGX_PREFIX/logs/business'
 
-Configuration for log directory starts from this line:  
+从这一行开始就是日志目录的配置：
 
     test -d '\$(DESTDIR)$NGX_PREFIX/logs/business' || mkdir -p '\$(DESTDIR)$NGX_PREFIX/logs/business'
 
-If you want to create multiple log directories during installation, just follow this way, for example:  
+如果想在安装的时候就创建多个日志目录，按照类似的方法增加即可，例如：
 
     test -d '\$(DESTDIR)$NGX_PREFIX/logs/business1' || mkdir -p '\$(DESTDIR)$NGX_PREFIX/logs/business1'
     test -d '\$(DESTDIR)$NGX_PREFIX/logs/business2' || mkdir -p '\$(DESTDIR)$NGX_PREFIX/logs/business2'
     test -d '\$(DESTDIR)$NGX_PREFIX/logs/business3' || mkdir -p '\$(DESTDIR)$NGX_PREFIX/logs/business3'
 
-Meanwhile, you need to update `hustlog.conf` as below:  
+同时要修改 `hustlog.conf` 如下：
 
     ......
     [rules]
@@ -109,12 +109,12 @@ Meanwhile, you need to update `hustlog.conf` as below:
     business2.*             "/data/hustlog/logs/business2/%d(%Y-%m-%d-%H).log";         default
     business3.*             "/data/hustlog/logs/business3/%d(%Y-%m-%d-%H).log";         default
 
-Then the log directories will be automatically created when the service is installed.  
+这样在安装服务的时候就会自动创建日志目录。
 
-### Configuration of `nginx` ###
-File path: `/data/hustlog/conf/nginx.conf`
+### `nginx` 配置 ###
+文件路径：`/data/hustlog/conf/nginx.conf`
 
-File contents sample:  
+文件内容样例：
 
     worker_processes  4;
     daemon on;
@@ -157,37 +157,38 @@ File contents sample:
         }
     }
 
-Please refer to [here](http://nginx.org/en/docs/) for details on above fields. You can see that the interface of `hustlog` is `/hustlog/post`. `http_basic_auth_file` is used to configure the path of key file for `http basic authentication`, the sample contents:  
+以上字段的含义均可在 [这里](http://nginx.org/en/docs/) 找到具体说明。可以看到，`hustlog` 提供的接口为 `/hustlog/post`，其中 `http_basic_auth_file` 用于配置 `http basic authentication` 的密钥文件路径，其内容样例如下：
 
     user:p@ssword
 
-The username and password are asymmetrically encrypted and stored in key file, which is used by built-in `ngx_http_auth_basic_module` of nginx, results to **encryption on username and password during per request**. According to the test, the QPS will **decrease by nearly an order of magnitude** duing to the issue.  
-`ngx_http_basic_auth_module` is used by `hustlog` just for such problem. Its key file uses **plain text** to store information to avoid performance problem on encryption. Please refer to `hustlog/nginx/src/http/modules/ngx_http_basic_auth_module.c` for details on implementation.  
+nginx 内置的 `ngx_http_auth_basic_module` 由于使用了非对称加密存储密钥文件，导致 **每一次请求都需要对用户信息做加密操作** 。经测试，以上问题会使得 `nginx` 服务的 `QPS` 下降 **接近一个数量级** 。  
+为了解决这个问题， `hustlog` 使用了定制化的 `ngx_http_basic_auth_module` 来实现 `http basic authentication` 功能。
+该模块对应的密钥文件使用 **明文** 存储，可以绕过加密操作所带来的性能问题。具体实现可参考 `hustlog/nginx/src/http/modules/ngx_http_basic_auth_module.c`。
 
-**You need to evaluate the interest and risk by yourself, and carefully consider the situation before you decide to apply this module.**  
+实际部署时，可以根据生产环境 **酌情使用** 该配置选项。
 
 ## API ##
 
-### Post log ###
+### 投递日志 ###
 
-**Interface:** `/hustlog/post`
+**接口:** `/hustlog/post`
 
-**Method:** `POST`
+**方法:** `POST`
 
-**Arguments:** 
+**参数:** 
 
-*  **category** (required)  
-log category, usually used to identify business type  
-*  **level** (required)  
-log level, optional values: `fatal|error|warn|notice|info|debug`, refer to `zlog`  
-*  **worker** (required)  
-Name of client process who posted log  
+*  **category** （必选）  
+日志类别，通常用于标识业务类型  
+*  **level** （必选）  
+日志等级，可选值包括 `fatal|error|warn|notice|info|debug`，参考 `zlog`
+*  **worker** （必选）  
+投递日志的客户端进程
 
-**Sample:**
+**使用范例:**
 
     curl -i -X POST -d 'test_log' "localhost:8667/hustlog/post?category=business&level=debug&worker=testworker" -H "Content-Type:text/plain" --user user:p@ssword
 
-**Result:**
+**返回值范例:**
 
 	HTTP/1.1 200 OK
     Server: nginx/1.12.0
@@ -196,16 +197,16 @@ Name of client process who posted log
     Content-Length: 0
     Connection: keep-alive
 
-## Performance of `hustlog` ##
+## `hustlog` 性能 ##
 
-* Configuration of machine  
+* 机器配置  
 24 core，64 gb，1 tb sata (7200rpm)    
-* Configuration of hustlog  
+* hustlog 配置  
 4 worker  
 
-**Press test script**
+**压测脚本**
 
-The script that generates random log content: `gen_data.sh`  
+生成随机日志内容的脚本：`gen_data.sh`
 
     #!/bin/bash
     MATRIX="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz~!@#$%^&*()_+="
@@ -218,15 +219,15 @@ The script that generates random log content: `gen_data.sh`
         echo "$PASS"
     exit 0
 
-Run command:  
+运行如下命令：
     
     sh gen_data.sh > /data/log_data
 
-Press test command:  
+压测命令：
 
     ab -A user:p@ssword -n 1000 -c 1000 -T "text/plain" -p "/data/log_data" "localhost:8667/hustlog/post?category=business&level=debug&worker=testworker"
 
-Result:  
+测试结果：
 
     Server Software:        nginx/1.12.0
     Server Hostname:        localhost
@@ -267,8 +268,7 @@ Result:
       98%     49
       99%     49
      100%     49 (longest request)
-
-You can see `QPS` hits **12 thousand** and even more.  
+可以看到 `QPS` 超过 **1.2w**
 
 ## LICENSE ##
 
