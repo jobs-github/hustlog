@@ -22,6 +22,19 @@ ngx_str_t ngx_http_get_conf_path(ngx_cycle_t * cycle, ngx_str_t * name)
     return path;
 }
 
+ngx_bool_t ngx_http_decode_bool(ngx_str_t * val)
+{
+    if (!val || !val->data || val->len < 1)
+    {
+        return false;
+    }
+    static ngx_str_t TRUE_STR = ngx_string("true");
+    static ngx_str_t TRUE_NUM = ngx_string("1");
+
+    return (0 == ngx_strncasecmp(val->data, TRUE_STR.data, TRUE_STR.len)
+        || 0 == ngx_strncasecmp(val->data, TRUE_NUM.data, TRUE_NUM.len));
+}
+
 int ngx_http_get_flag_slot(ngx_conf_t * cf)
 {
     ngx_str_t * value = cf->args->elts;
@@ -980,4 +993,28 @@ ngx_shm_zone_t * ngx_http_addon_init_shm(
     zone->data = ctx;
 
     return zone;
+}
+
+ngx_bool_t ngx_http_init_addon_backends(
+    ngx_http_upstream_main_conf_t * umcf,
+    ngx_str_t * backend,
+    ngx_http_addon_upstream_peers_t * peers)
+{
+    if (!umcf || umcf->upstreams.nelts < 1 || !backend || !backend->data || !peers)
+    {
+        return false;
+    }
+    ngx_http_upstream_srv_conf_t **uscfp = (ngx_http_upstream_srv_conf_t **) umcf->upstreams.elts;
+    ngx_uint_t i = 0;
+    for (i = 0; i < umcf->upstreams.nelts; ++i)
+    {
+        ngx_http_upstream_srv_conf_t *uscf = uscfp[i];
+        if ((uscf->host.len == backend->len) && (0 == ngx_strncmp(uscf->host.data, backend->data, backend->len)))
+        {
+            peers->peer = uscf->peer.data;
+            peers->count = uscf->servers->nelts;
+            return true;
+        }
+    }
+    return false;
 }

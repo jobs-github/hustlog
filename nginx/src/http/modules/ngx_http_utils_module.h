@@ -34,6 +34,7 @@ typedef struct
 } ngx_http_request_item_t;
 
 ngx_str_t ngx_http_get_conf_path(ngx_cycle_t * cycle, ngx_str_t * name);
+ngx_bool_t ngx_http_decode_bool(ngx_str_t * val);
 int ngx_http_get_flag_slot(ngx_conf_t * cf);
 ngx_bool_t ngx_http_str_eq(const ngx_str_t * src, const ngx_str_t * dst);
 ngx_str_t ngx_http_make_str(const ngx_str_t * str, ngx_pool_t * pool);
@@ -146,5 +147,16 @@ ngx_shm_zone_t * ngx_http_addon_init_shm(
     size_t sizeof_sh,
     ngx_http_addon_init_shm_ctx_t init_sh,
     void * module);
+
+typedef struct
+{
+    ngx_http_upstream_rr_peers_t * peer;
+    ngx_int_t count;
+} ngx_http_addon_upstream_peers_t;
+
+ngx_bool_t ngx_http_init_addon_backends(
+    ngx_http_upstream_main_conf_t * umcf,
+    ngx_str_t * backend,
+    ngx_http_addon_upstream_peers_t * peers);
 
 #endif // __ngx_http_utils_module_20150910210608_h__
